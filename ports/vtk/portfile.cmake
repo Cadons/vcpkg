@@ -10,7 +10,7 @@ set(VCPKG_POLICY_SKIP_ABSOLUTE_PATHS_CHECK enabled)
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO Kitware/VTK
-    REF edd2a192de28f042a548ef8f8663c255aadd6b08 # v9.6.x used by ParaView 5.12.0
+    REF edd2a192de28f042a548ef8f8663c255aadd6b08 # v9.6.0
     SHA512 6f2fe9f316a228a32fed08deb845b88ed8c016a615f079673333efdef7b532ed656bba30f53d32c13738c04c2fad66515d0e29ee0cd991fdfd537e3e1f4d65b0
     HEAD_REF master
     PATCHES
@@ -242,10 +242,6 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
 
 # =============================================================================
 # Configure & Install
-file(COPY
-    "${SOURCE_PATH}/ThirdParty/ioss/vtkioss/Ioss_TransformFactory.h"
-    DESTINATION
-    "${CURRENT_PACKAGES_DIR}/include/")
 # We set all libraries to "system" and explicitly list the ones that should use embedded copies
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
@@ -307,6 +303,14 @@ vcpkg_cmake_configure(
 vcpkg_cmake_install()
 vcpkg_copy_pdbs()
 
+# Install the IOSS transform factory header (from VTK's bundled ioss) into the package include directory
+if(EXISTS "${SOURCE_PATH}/ThirdParty/ioss/vtkioss/Ioss_TransformFactory.h")
+    file(COPY
+        "${SOURCE_PATH}/ThirdParty/ioss/vtkioss/Ioss_TransformFactory.h"
+        DESTINATION
+        "${CURRENT_PACKAGES_DIR}/include/")
+endif()
+
 # =============================================================================
 # Fixup target files
 vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/vtk-${VTK_SHORT_VERSION})
@@ -358,7 +362,7 @@ set(VTK_TOOLS
     vtkWrapTcl-${VTK_SHORT_VERSION}
     vtkWrapPythonInit-${VTK_SHORT_VERSION}
     vtkWrapPython-${VTK_SHORT_VERSION}
-    vtkWrapSerDes-${VTK_SHORT_VERSION} 
+    vtkWrapSerDes-${VTK_SHORT_VERSION}
     vtkWrapJava-${VTK_SHORT_VERSION}
     vtkWrapHierarchy-${VTK_SHORT_VERSION}
     vtkParseJava-${VTK_SHORT_VERSION}
@@ -376,7 +380,7 @@ foreach(TOOL_NAME IN LISTS VTK_TOOLS)
     _vtk_move_release_tool("${TOOL_NAME}")
 endforeach()
 
-if(EXISTS "${CURRENT_PACKAGES_DIR}/bin/vtktoken-9.3.dll" AND VCPKG_LIBRARY_LINKAGE STREQUAL "static")
+if(EXISTS "${CURRENT_PACKAGES_DIR}/bin/vtktoken-${VTK_SHORT_VERSION}.dll" AND VCPKG_LIBRARY_LINKAGE STREQUAL "static")
   # vendored "token" library can be only build as a shared library
   set(VCPKG_POLICY_DLLS_IN_STATIC_LIBRARY enabled)
 elseif(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
