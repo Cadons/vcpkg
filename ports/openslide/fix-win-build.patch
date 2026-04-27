@@ -124,4 +124,3 @@ index dd3a6a2..ad9233e 100644
  #include <glib.h>
  #include "openslide.h"
  #include "test-common.h"
-
